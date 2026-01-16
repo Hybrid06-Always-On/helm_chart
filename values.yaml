@@ -1,0 +1,12 @@
+global:
+  nameOverride: ""
+  fullnameOverride: ""
+
+frontend:
+  enabled: true
+
+backend:
+  enabled: true
+
+monitoring:
+  enabled: false

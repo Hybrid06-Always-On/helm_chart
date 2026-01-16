@@ -1,0 +1,24 @@
+# Prometheus 파드 설정
+replicaCount: 1
+
+image:
+  repository: prom/prometheus
+  tag: "v2.45.0"
+  pullPolicy: IfNotPresent
+
+# 서비스 설정
+service:
+  name: prometheus-svc
+  type: ClusterIP
+  port: 9090
+
+# [중요] 성공했던 타겟 정보들
+scrapeConfigs:
+  - job_name: 'nodejs-backend'
+    targets: ['backend-svc.monitoring.svc.cluster.local:3000']
+  - job_name: 'external-proxy'
+    targets: ['10.5.1.20:9100', '10.5.1.20:9113', '10.5.1.20:9101']
+  - job_name: 'external-db'
+    targets: ['10.5.4.90:9104', '10.5.4.100:9104']
+  - job_name: 'external-minio'
+    targets: ['10.5.4.90:9000', '10.5.4.100:9000']

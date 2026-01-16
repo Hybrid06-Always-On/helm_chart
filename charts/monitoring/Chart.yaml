@@ -1,0 +1,19 @@
+apiVersion: v2
+name: monitoring
+description: Unified Monitoring Chart (Prometheus, Grafana, Loki, Promtail)
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: prometheus
+    version: "0.1.0"
+    repository: "file://./charts/prometheus"
+  - name: grafana
+    version: "0.1.0"
+    repository: "file://./charts/grafana"
+  - name: loki
+    version: "0.1.0"
+    repository: "file://./charts/loki"
+  - name: promtail
+    version: "0.1.0"
+    repository: "file://./charts/promtail"

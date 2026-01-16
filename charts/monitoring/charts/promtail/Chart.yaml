@@ -1,0 +1,5 @@
+apiVersion: v2
+name: promtail
+description: 로그 배달부 Promtail 차트
+version: 0.1.0
+type: application

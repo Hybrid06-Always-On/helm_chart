@@ -1,0 +1,22 @@
+# Grafana 파드 설정
+replicaCount: 1
+
+image:
+  repository: grafana/grafana
+  tag: "10.0.3"
+  pullPolicy: IfNotPresent
+
+# 서비스 설정 (성공했던 NodePort 32000 적용)
+service:
+  name: grafana-svc
+  type: NodePort
+  port: 3000
+  targetPort: 3000
+  nodePort: 32001
+
+# 관리자 비밀번호
+adminPassword: "admin"
+
+# 라벨 설정
+labels:
+  app: grafana

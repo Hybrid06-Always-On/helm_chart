@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: promtail-config
+  namespace: monitoring
+data:
+  promtail.yaml: |
+    server:
+      http_listen_port: 9080
+
+    clients:
+      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+    scrape_configs:
+      - job_name: kubernetes-pods
+        pipeline_stages:
+          - docker: {}
+          # --- [추가] JSON 로그 파싱 스테이지 ---
+          # 백엔드에서 보내주는 JSON 형식을 분석해 개별 데이터로 쪼갭니다.
+          - json:
+              expressions:
+                level: level
+                method: method
+                url: url
+                status: status
+                duration: duration_ms
+          # 추출된 값들을 Grafana에서 필터로 쓸 수 있게 레이블로 등록합니다.
+          - labels:
+              level:
+              method:
+              status:
+          # ------------------------------------
+        
+        kubernetes_sd_configs:
+          - role: pod
+        
+        relabel_configs:
+          # 1. 실제 노드의 폴더 구조(Namespace_PodName_UID/ContainerName/*.log) 매칭
+          - source_labels: 
+              - __meta_kubernetes_namespace
+              - __meta_kubernetes_pod_name
+              - __meta_kubernetes_pod_uid
+              - __meta_kubernetes_pod_container_name
+            separator: _
+            regex: (.*)_(.*)_(.*)_(.*)
+            # $1=NS, $2=PodName, $3=UID, $4=ContainerName
+            replacement: /var/log/pods/${1}_${2}_${3}/${4}/*.log
+            target_label: __path__
+
+          # 2. Grafana에서 필터링하기 위한 레이블 추출
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: job
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: container

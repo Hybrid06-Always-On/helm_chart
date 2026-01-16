@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+
+    scrape_configs:
+      # 1. Prometheus 자기 자신 메트릭
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # 2. 백엔드 API 서버 전용 수집 (라벨 기반)
+      - job_name: 'backend-api'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app, __meta_kubernetes_pod_label_component]
+            separator: ;
+            regex: backend;api
+            action: keep
+          - source_labels: [__address__]
+            action: replace
+            regex: ([^:]+)(?::\d+)?
+            replacement: $1:3000
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name
+          - target_label: job
+            replacement: backend-api
+
+      # 3. 외부 MySQL DB 서버 수집
+      - job_name: 'mysql-db'
+        static_configs:
+          - targets: ['10.5.4.90:9104']
+        relabel_configs:
+          - target_label: job
+            replacement: mysql-master
+          - target_label: instance
+            replacement: 'mysql-primary'
+
+      # 5. [추가] 외부 Nginx & HAProxy (Proxy 서버) 수집
+      - job_name: 'external-proxy'
+        static_configs:
+          - targets: ['10.5.1.20:9113']
+            labels:
+              component: 'nginx'
+          - targets: ['10.5.1.20:9101']
+            labels:
+              component: 'haproxy'
+        relabel_configs:
+          - target_label: instance
+            replacement: 'proxy-server'
+
+      # 4. 기존 Kubernetes Pod 자동 탐지 설정 (어노테이션 기반)
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: replace
+            target_label: job
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name

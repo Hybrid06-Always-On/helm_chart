@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: grafana/loki
+  tag: "2.9.2"
+  pullPolicy: IfNotPresent
+
+labels:
+  app: loki
+
+service:
+  name: loki-svc
+  port: 3100
+
+# MinIO 연결용 정보
+secrets:
+  name: loki-secret
+  data:
+    MINIO_ENDPOINT: "10.5.4.90"
+    MINIO_PORT: "9000"
+    MINIO_ACCESS_KEY: "0QAZ30L7IB0GGW1A56O8"
+    MINIO_SECRET_KEY: "ZRuLNbCwZIbIp0MQ4NZw5cbyspCRoFLQTkEC7fLS"

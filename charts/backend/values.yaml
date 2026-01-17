@@ -50,7 +50,7 @@ cronjob:
   # encoder 컨테이너 이미지
   image:
     repository: arjleun581/backend-encode
-    tag: "2.3"
+    tag: "13.0"
     pullPolicy: IfNotPresent
   # NFS 볼륨 (원본영상 저장용 공유 스토리지)
   nfs:

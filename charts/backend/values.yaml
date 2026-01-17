@@ -4,53 +4,40 @@
 
 # backend Deployment 파드 개수
 replicaCount: 3
-
 # backend Deployment / Pod 라벨
 labels:
   app: backend
   component: api
-
 labels:
   app: backend
   component: encoder
-
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
-  tag: "2.1"
+  tag: "35.0"
   pullPolicy: IfNotPresent
-
 # backend API 컨테이너 포트
 containerPort: 3000
-
-
 # ==================================================
 # Backend Service (ClusterIP)
 # ==================================================
-
 service:
   name: backend-svc
   type: ClusterIP
-  port: 3000        # Service 포트
-  targetPort: 3000  # 컨테이너 포트
-
-
+  port: 3000 # Service 포트
+  targetPort: 3000 # 컨테이너 포트
 # ==================================================
 # Backend Autoscaling (HPA)
 # ==================================================
-
 autoscaling:
   enabled: true
   minReplicas: 3
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
-
-
 # ==================================================
 # Backend Encoder (CronJob)
 # - 영상 인코딩용 배치 작업
 # ==================================================
-
 cronjob:
   enabled: true
   name: backend-encode-cj
@@ -60,25 +47,20 @@ cronjob:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   restartPolicy: OnFailure
-
   # encoder 컨테이너 이미지
   image:
     repository: arjleun581/backend-encode
     tag: "2.3"
     pullPolicy: IfNotPresent
-
   # NFS 볼륨 (원본영상 저장용 공유 스토리지)
   nfs:
     server: 10.5.4.110
     path: /mnt/video_data
     mountPath: /video_data
-
-
 # ==================================================
 # Backend Secrets (DB / MinIO)
 # - Deployment / CronJob 공통 사용
 # ==================================================
-
 secrets:
   name: backend-secret
   data:
@@ -87,7 +69,6 @@ secrets:
     DB_USER: "stream_app"
     DB_PASSWORD: "app123"
     DB_DATABASE: "streaming"
-
     # MinIO 설정
     MINIO_ENDPOINT: "10.5.1.20"
     MINIO_PORT: "9000"
@@ -96,12 +77,9 @@ secrets:
     MINIO_SECRET_KEY: "ZRuLNbCwZIbIp0MQ4NZw5cbyspCRoFLQTkEC7fLS"
     MINIO_BUCKET_HLS: "video-hls"
     MINIO_BUCKET_THUMB: "video-thumb"
-
-
 # ==================================================
 # Backend Resource Management (Deployment)
 # ==================================================
-
 resources:
   requests:
     cpu: 100m
@@ -109,20 +87,16 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-
-
 # ==========================================
 # Backend Probe (HTTP based)
 # ==========================================
 probes:
   enabled: true
-
   readiness:
     path: /metrics
     initialDelaySeconds: 10
     periodSeconds: 10
     failureThreshold: 3
-
   liveness:
     path: /metrics
     initialDelaySeconds: 30

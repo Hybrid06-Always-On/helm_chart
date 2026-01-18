@@ -14,7 +14,7 @@ labels:
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
-  tag: "48.0"
+  tag: "49.0"
   pullPolicy: IfNotPresent
 # backend API 컨테이너 포트
 containerPort: 3000

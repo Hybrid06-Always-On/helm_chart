@@ -1,51 +1,42 @@
-apiVersion: apps/v1
-kind: Deployment
+{{- if .Values.cronjob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: backend-deploy
+  name: {{ .Values.cronjob.name }}
   labels:
     {{- include "backend.commonLabels" . | nindent 4 }}
-    component: {{ .Values.components.api }}
+    component: {{ .Values.components.encoder }}
 spec:
-  replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      labels:
-        {{- include "backend.commonLabels" . | nindent 8 }}
-        component: {{ .Values.components.api }}
-
+  schedule: "{{ .Values.cronjob.schedule }}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
     spec:
-      containers:
-        - name: backend-container
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+      template:
+        metadata:
+          labels:
+            {{- include "backend.commonLabels" . | nindent 12 }}
+            component: {{ .Values.components.encoder }}
+        spec:
+          restartPolicy: {{ .Values.cronjob.restartPolicy }}
 
-          ports:
-            - containerPort: {{ .Values.containerPort }}
+          containers:
+            - name: backend-encoder
+              image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
+              imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
 
-          envFrom:
-            - secretRef:
-                name: {{ .Values.secrets.name }}
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.secrets.name }}
 
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+              volumeMounts:
+                - name: video-data
+                  mountPath: {{ .Values.nfs.mountPath }}
 
-          {{- if .Values.probes.enabled }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.probes.readiness.path }}
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
-            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
-
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.probes.liveness.path }}
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
-            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
-          {{- end }}
+          volumes:
+            - name: video-data
+              nfs:
+                server: {{ .Values.nfs.server }}
+                path: {{ .Values.nfs.path }}
+{{- end }}

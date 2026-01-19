@@ -4,7 +4,7 @@ metadata:
   name: backend-deploy
   labels:
     {{- include "backend.commonLabels" . | nindent 4 }}
-    component: api
+    component: {{ .Values.components.api }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -14,7 +14,8 @@ spec:
     metadata:
       labels:
         {{- include "backend.commonLabels" . | nindent 8 }}
-        component: api
+        component: {{ .Values.components.api }}
+
     spec:
       containers:
         - name: backend-container

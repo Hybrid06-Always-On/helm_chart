@@ -3,9 +3,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Values.job.name }}
+  labels:
+    {{- include "backend.commonLabels" . | nindent 4 }}
+    component: {{ .Values.components.encoder }}
 spec:
   backoffLimit: 3
   template:
+    metadata:
+      labels:
+        {{- include "backend.commonLabels" . | nindent 8 }}
+        component: {{ .Values.components.encoder }}
     spec:
       restartPolicy: {{ .Values.job.restartPolicy }}
       containers:
@@ -17,9 +24,10 @@ spec:
                 name: {{ .Values.secrets.name }}
           volumeMounts:
             - name: video-data
-              mountPath: {{ .Values.storage.mountPath }}
+              mountPath: {{ .Values.nfs.mountPath }}
       volumes:
         - name: video-data
-          persistentVolumeClaim:
-            claimName: {{ .Values.storage.pvc.name }}
+          nfs:
+            server: {{ .Values.nfs.server }}
+            path: {{ .Values.nfs.path }}
 {{- end }}

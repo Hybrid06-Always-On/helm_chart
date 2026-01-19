@@ -15,15 +15,9 @@ data:
       path_prefix: /var/loki
       replication_factor: 1
       storage:
-        s3:
-          # 서비스 엔드포인트 (ExternalName 또는 Service+Endpoints)
-          endpoint: external-minio:9000 
-          # 새로 발급받으신 Loki 전용 키 정보
-          access_key_id: "OC14K8BOK41E4OR9V38X"
-          secret_access_key: "DvEOJ6OsXnGmmSnLfzMTHPBHLRumprteANbXFSTC"
-          bucketnames: "monitoring-loki"
-          insecure: true
-          s3forcepathstyle: true
+        filesystem:
+          chunks_directory: /var/loki/chunks
+          rules_directory: /var/loki/rules
       ring:
         instance_addr: 127.0.0.1
         kvstore:
@@ -38,12 +32,13 @@ data:
       enforce_metric_name: false
       reject_old_samples: true
       reject_old_samples_max_age: 168h
+      retention_period: 168h  # 7일 보관 설정 (추가)
 
     schema_config:
       configs:
         - from: 2020-10-24
           store: boltdb-shipper
-          object_store: s3
+          object_store: filesystem
           schema: v11
           index:
             prefix: index_
@@ -53,8 +48,16 @@ data:
       boltdb_shipper:
         active_index_directory: /var/loki/index
         cache_location: /var/loki/cache
-        shared_store: s3
+        shared_store: filesystem
     
+    # 실제 데이터 삭제를 실행하는 컴팩터 설정 (추가)
+    compactor:
+      working_directory: /var/loki/retention
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150
+
     ruler:
       storage:
         type: local

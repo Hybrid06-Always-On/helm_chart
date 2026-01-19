@@ -1,20 +1,22 @@
 {{- define "backend.name" -}}
 backend
-{{- end -}}
+{{- end }}
 
 {{- define "backend.fullname" -}}
 {{ printf "%s-%s" .Release.Name (include "backend.name" .) }}
-{{- end -}}
+{{- end }}
 
-# selectorLabels → API 전용
+# selectorLabels (Deployment / Service selector 전용)
 {{- define "backend.selectorLabels" -}}
 app: {{ .Values.labels.app }}
 component: api
-{{- end -}}
+{{- end }}
 
-# 공통 라벨 (component는 각 리소스에서 오버라이드)
+# 공통 labels (모든 리소스 공통)
 {{- define "backend.commonLabels" -}}
 app: {{ .Values.labels.app }}
-helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+app.kubernetes.io/name: {{ include "backend.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+{{- end }}

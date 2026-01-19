@@ -24,9 +24,10 @@ containerPort: 3000
 # ==================================================
 service:
   name: backend-svc
-  type: ClusterIP
-  port: 3000 # Service 포트
-  targetPort: 3000 # 컨테이너 포트
+  type: NodePort
+  port: 3000
+  targetPort: 3000
+  nodePort: 32000
 # ==================================================
 # Backend Autoscaling (HPA)
 # ==================================================
@@ -35,6 +36,7 @@ autoscaling:
   minReplicas: 3
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
+
 # ==================================================
 # Backend Encoder (CronJob + job)
 # - 영상 인코딩용 배치 작업
@@ -45,7 +47,7 @@ job:
   name: backend-encode-job
   restartPolicy: OnFailure
 
-  activeDeadlineSeconds: 600    #  30분까지 실행 허용
+  activeDeadlineSeconds: 300   #  30분까지 실행 허용
   ttlSecondsAfterFinished: 300     #  완료 후 5분 뒤 삭제
 
   image:

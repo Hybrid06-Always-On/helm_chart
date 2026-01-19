@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:10.1.0
+          image: grafana/grafana:10.1.0 # 요청하신 10.1.0 버전 유지합니다 👊
           ports:
             - containerPort: 3000
           env:
@@ -24,6 +24,15 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: /var/lib/grafana
+            # --- Provisioning 설정 추가 부분 ---
+            - name: provisioning-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+              readOnly: true
+            # ----------------------------------
       volumes:
         - name: storage
-          emptyDir: {}
+          emptyDir: {} # 나중에 여기도 PVC로 바꾸면 대시보드 커스텀 설정이 유지됩니다!
+        # --- ConfigMap 볼륨 정의 추가 부분 ---
+        - name: provisioning-datasources
+          configMap:
+            name: grafana-datasources # 이 이름의 ConfigMap이 미리 있어야 합니다.

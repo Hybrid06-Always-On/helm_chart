@@ -1,40 +1,36 @@
-{{- if .Values.cronjob.enabled }}
+{{- if .Values.job.enabled }}
 apiVersion: batch/v1
-kind: CronJob
+kind: Job
 metadata:
-  name: {{ .Values.cronjob.name }}
+  name: {{ .Values.job.name }}
   labels:
     {{- include "backend.commonLabels" . | nindent 4 }}
+    component: {{ .Values.components.encoder }}
 spec:
-  schedule: "{{ .Values.cronjob.schedule }}"
-  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
-  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
-  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
-  jobTemplate:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "backend.commonLabels" . | nindent 8 }}
+        component: {{ .Values.components.encoder }}
     spec:
-      template:
-        metadata:
-          labels:
-            {{- include "backend.commonLabels" . | nindent 12 }}
-        spec:
-          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+      restartPolicy: {{ .Values.job.restartPolicy }}
+      containers:
+        - name: backend-encoder
+          image: "{{ .Values.job.image.repository }}:{{ .Values.job.image.tag }}"
+          imagePullPolicy: {{ .Values.job.image.pullPolicy }}
 
-          containers:
-            - name: backend-encoder
-              image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
-              imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.name }}
 
-              envFrom:
-                - secretRef:
-                    name: {{ .Values.secrets.name }}
-
-              volumeMounts:
-                - name: video-data
-                  mountPath: {{ .Values.cronjob.nfs.mountPath }}
-
-          volumes:
+          volumeMounts:
             - name: video-data
-              nfs:
-                server: {{ .Values.cronjob.nfs.server }}
-                path: {{ .Values.cronjob.nfs.path }}
+              mountPath: {{ .Values.nfs.mountPath }}
+
+      volumes:
+        - name: video-data
+          nfs:
+            server: {{ .Values.nfs.server }}
+            path: {{ .Values.nfs.path }}
 {{- end }}

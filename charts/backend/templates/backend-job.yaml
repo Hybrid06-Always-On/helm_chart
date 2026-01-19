@@ -7,7 +7,10 @@ metadata:
     {{- include "backend.commonLabels" . | nindent 4 }}
     component: {{ .Values.components.encoder }}
 spec:
-  backoffLimit: 3
+  backoffLimit: 5
+  activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ .Values.job.ttlSecondsAfterFinished }}
+
   template:
     metadata:
       labels:
@@ -19,15 +22,12 @@ spec:
         - name: backend-encoder
           image: "{{ .Values.job.image.repository }}:{{ .Values.job.image.tag }}"
           imagePullPolicy: {{ .Values.job.image.pullPolicy }}
-
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.name }}
-
           volumeMounts:
             - name: video-data
               mountPath: {{ .Values.nfs.mountPath }}
-
       volumes:
         - name: video-data
           nfs:

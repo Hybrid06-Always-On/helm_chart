@@ -1,26 +1,64 @@
-Backend API has been successfully deployed.
+=========================================
+Backend Encoder Deployment Completed
+=========================================
 
-Resources created:
+This Helm release deploys the Backend API along with
+video encoding batch workloads using Kubernetes Job and CronJob.
 
-- Deployment
-  Name: backend-deploy
-  Replicas: {{ .Values.replicaCount }}
+-----------------------------------------
+1. Backend API
+-----------------------------------------
+- Backend API is deployed as a Deployment.
+- Service type: ClusterIP
+- Replicas are managed by HPA.
 
-- Service
-  Name: {{ .Values.service.name }}
-  Type: {{ .Values.service.type }}
-  Port: {{ .Values.service.port }}
+Check Backend API resources:
+  kubectl get deploy -n {{ .Release.Namespace }}
+  kubectl get svc -n {{ .Release.Namespace }}
 
-{{- if .Values.autoscaling.enabled }}
-- Horizontal Pod Autoscaler
-  Min Replicas: {{ .Values.autoscaling.minReplicas }}
-  Max Replicas: {{ .Values.autoscaling.maxReplicas }}
-{{- end }}
+-----------------------------------------
+2. Backend Encoder (One-time Job)
+-----------------------------------------
+- A one-time encoding Job is executed during the initial deployment.
+- This Job is intended to process existing videos immediately,
+  without waiting for the CronJob schedule.
 
-{{- if .Values.cronjob.enabled }}
-- Encoder CronJob
-  Name: {{ .Values.cronjob.name }}
-  Schedule: {{ .Values.cronjob.schedule }}
-{{- end }}
+Check Job status:
+  kubectl get jobs -n {{ .Release.Namespace }}
 
-Access the backend service via the internal ClusterIP service.
+Check Job Pod logs:
+  kubectl logs job/{{ .Values.job.name }} -n {{ .Release.Namespace }}
+
+-----------------------------------------
+3. Backend Encoder (CronJob)
+-----------------------------------------
+- A CronJob is configured to run video encoding periodically.
+- Schedule: {{ .Values.cronjob.schedule }}
+
+Check CronJob status:
+  kubectl get cronjob -n {{ .Release.Namespace }}
+
+-----------------------------------------
+4. Storage (NFS via PV/PVC)
+-----------------------------------------
+- Encoder Job and CronJob share a PersistentVolumeClaim.
+- The PVC is backed by an already constructed NFS server.
+- Storage capacity is declared logically for Kubernetes resource management.
+- No physical disk partitioning or enforcement is applied.
+
+PVC information:
+  kubectl get pvc {{ .Values.storage.pvc.name }} -n {{ .Release.Namespace }}
+
+-----------------------------------------
+5. Important Notes
+-----------------------------------------
+- Encoder Pods are created only when Jobs are executed.
+- After completion, Pods are terminated automatically.
+- Encoded data persists on the NFS-backed PersistentVolume.
+- CronJob executions do not interfere with the initial one-time Job.
+
+-----------------------------------------
+Release Information
+-----------------------------------------
+Release Name: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}

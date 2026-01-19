@@ -7,10 +7,11 @@ replicaCount: 3
 # backend Deployment / Pod 라벨
 labels:
   app: backend
-  component: api
-labels:
-  app: backend
-  component: encoder
+
+components:
+  api: api
+  encoder: encoder
+
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
@@ -35,28 +36,47 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
 # ==================================================
-# Backend Encoder (CronJob)
+# Backend Encoder (CronJob + job)
 # - 영상 인코딩용 배치 작업
+# - 초기 1회 인코딩 job 
 # ==================================================
-cronjob:
+job:
   enabled: true
-  name: backend-encode-cj
-  schedule: "0 0 */5 * *"
-  startingDeadlineSeconds: 300
-  concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 3
+  name: backend-encode-job
   restartPolicy: OnFailure
-  # encoder 컨테이너 이미지
+
+  activeDeadlineSeconds: 600    #  30분까지 실행 허용
+  ttlSecondsAfterFinished: 300     #  완료 후 5분 뒤 삭제
+
   image:
     repository: arjleun581/backend-encode
     tag: "1.0"
     pullPolicy: IfNotPresent
-  # NFS 볼륨 (원본영상 저장용 공유 스토리지)
-  nfs:
-    server: 10.5.4.110
-    path: /mnt/video_data
-    mountPath: /video_data
+
+
+cronjob:
+  enabled: true
+  name: backend-encode-cj
+  schedule: "0 0 */5 * *"
+  startingDeadlineSeconds: 300  
+  concurrencyPolicy: Forbid     
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  restartPolicy: OnFailure
+  image:
+    repository: arjleun581/backend-encode
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+
+# ==================================================
+# Common NFS (Job / CronJob 공통 사용)
+# ==================================================
+nfs:
+  server: 10.5.4.110
+  path: /mnt/video_data
+  mountPath: /video_data
+
 # ==================================================
 # Backend Secrets (DB / MinIO)
 # - Deployment / CronJob 공통 사용

@@ -1,0 +1,15 @@
+dependencies:
+- name: prometheus
+  repository: file://./charts/prometheus
+  version: 0.1.0
+- name: grafana
+  repository: file://./charts/grafana
+  version: 0.1.0
+- name: loki
+  repository: file://./charts/loki
+  version: 0.1.0
+- name: promtail
+  repository: file://./charts/promtail
+  version: 0.1.0
+digest: sha256:45685f0a3085ea04f38db9f4b95eeaf4e059e2e1daf0eba3740d261f6beb4ed5
+generated: "2026-01-19T19:19:05.876987488+09:00"

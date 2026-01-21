@@ -95,8 +95,8 @@ secrets:
     MINIO_ENDPOINT: "10.5.1.20"
     MINIO_PORT: "9000"
     MINIO_USE_SSL: "false"
-    MINIO_ACCESS_KEY: "0QAZ30L7IB0GGW1A56O8"
-    MINIO_SECRET_KEY: "ZRuLNbCwZIbIp0MQ4NZw5cbyspCRoFLQTkEC7fLS"
+    MINIO_ACCESS_KEY: "backend"
+    MINIO_SECRET_KEY: "backend123"
     MINIO_BUCKET_HLS: "video-hls"
     MINIO_BUCKET_THUMB: "video-thumb"
 # ==================================================

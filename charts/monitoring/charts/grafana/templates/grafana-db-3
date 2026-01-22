@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   main-dashboard.json: |-
-    {
+{{ ` {
   "annotations": {
     "list": [
       {
@@ -301,4 +301,4 @@ data:
   "uid": "sadlil-loki-apps-dashboard",
   "version": 3,
   "weekStart": ""
-}
+} ` | indent 4 }}

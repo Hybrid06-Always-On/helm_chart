@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   main-dashboard.json: |-
-    {
+{{ ` {
   "annotations": {
     "list": [
       {
@@ -911,4 +911,4 @@ data:
   "uid": "yX2d7k1Gk",
   "version": 4,
   "weekStart": ""
-}
+} ` | indent 4 }}

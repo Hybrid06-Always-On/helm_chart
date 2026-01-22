@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-db-main  # 이 이름을 기억하세요!
+  name: grafana-db-main  
   namespace: {{ .Release.Namespace }}
 data:
   main-dashboard.json: |-

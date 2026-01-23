@@ -4,6 +4,5 @@ metadata:
   name: grafana-db-main
   namespace: {{ .Release.Namespace }}
 data:
-  # 'dashboards/db-4.json'은 차트 루트 기준 경로입니다.
-  main-dashboard.json: |-
+  db-main.json: |-  
 {{ .Files.Get "dashboards/db-main.json" | indent 4 }}

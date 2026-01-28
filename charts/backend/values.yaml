@@ -13,7 +13,7 @@ components:
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
-  tag: "5.0"
+  tag: "7.0"
   pullPolicy: IfNotPresent
 # backend API 컨테이너 포트
 containerPort: 3000

@@ -6,7 +6,7 @@ image:
 containerPort: 80
 service:
   name: frontend-svc
-  type: LoadBalancer
+  type: ClusterIP
   port: 80
 resources:
   requests:

@@ -1,9 +1,0 @@
-domain: www.alwaysonteam.store
-
-frontend:
-  serviceName: frontend-svc
-  servicePort: 80
-
-backend:
-  serviceName: backend-svc
-  servicePort: 3000

@@ -113,3 +113,16 @@ probes:
     initialDelaySeconds: 30
     periodSeconds: 20
     failureThreshold: 3
+
+# ==========================================
+# ingress
+# ==========================================
+domain: www.alwaysonteam.store
+
+frontend:
+  serviceName: frontend-svc
+  servicePort: 80
+
+backend:
+  serviceName: backend-svc
+  servicePort: 3000

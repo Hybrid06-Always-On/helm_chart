@@ -117,7 +117,9 @@ probes:
 # ==========================================
 # ingress
 # ==========================================
-domain: www.alwaysonteam.store
+domains:
+  - www.alwaysonteam.store
+  - alwaysonteam.store
 
 frontend:
   serviceName: frontend-svc

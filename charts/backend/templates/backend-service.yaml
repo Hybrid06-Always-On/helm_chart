@@ -5,13 +5,10 @@ metadata:
   labels:
     {{- include "backend.commonLabels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   selector:
     {{- include "backend.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
-      {{- if and (eq .Values.service.type "NodePort") (.Values.service.nodePort) }}
-      nodePort: {{ .Values.service.nodePort }}
-      {{- end }}

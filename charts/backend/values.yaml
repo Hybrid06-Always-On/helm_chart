@@ -13,7 +13,7 @@ components:
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
-  tag: "8.0"
+  tag: "11.0"
   pullPolicy: IfNotPresent
 # backend API 컨테이너 포트
 containerPort: 3000
@@ -113,18 +113,15 @@ probes:
     initialDelaySeconds: 30
     periodSeconds: 20
     failureThreshold: 3
-
 # ==========================================
 # ingress
 # ==========================================
 domains:
   - www.alwaysonteam.store
   - alwaysonteam.store
-
 frontend:
   serviceName: frontend-svc
   servicePort: 80
-
 backend:
   serviceName: backend-svc
   servicePort: 3000

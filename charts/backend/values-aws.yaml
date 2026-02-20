@@ -69,25 +69,16 @@ nfs:
   path: /mnt/video_data
   mountPath: /video_data
 # ==================================================
-# Backend Secrets (DB / MinIO)
-# - Deployment / CronJob 공통 사용
+# Backend ingress , secret
+# nginx 전용
 # ==================================================
 secrets:
-  name: backend-secret
-  data:
-    # DB 설정
-    DB_HOST: "10.5.1.20"
-    DB_USER: "stream_app"
-    DB_PASSWORD: "app123"
-    DB_DATABASE: "streaming"
-    # MinIO 설정
-    MINIO_ENDPOINT: "10.5.1.20"
-    MINIO_PORT: "9000"
-    MINIO_USE_SSL: "false"
-    MINIO_ACCESS_KEY: "backend"
-    MINIO_SECRET_KEY: "backend123"
-    MINIO_BUCKET_HLS: "video-hls"
-    MINIO_BUCKET_THUMB: "video-thumb"
+  name: "backend-secret-onprem"
+ingress:
+  name: "backend-ingress-nginx"
+  ingressClassName: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/preserve-host: "true"
 # ==================================================
 # Backend Resource Management (Deployment)
 # ==================================================

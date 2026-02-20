@@ -54,7 +54,7 @@ cronjob:
   schedule: "0 0 */5 * *"
   startingDeadlineSeconds: 300
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1 
   failedJobsHistoryLimit: 3
   restartPolicy: OnFailure
   image:
@@ -69,16 +69,17 @@ nfs:
   path: /mnt/video_data
   mountPath: /video_data
 # ==================================================
-# Backend ingress , secret
-# nginx 전용
+# Backend ingress 
+# alb 전용
 # ==================================================
 secrets:
-  name: "backend-secret-onprem"
+  name: "backend-secret-alb"
 ingress:
-  name: "backend-ingress-nginx"
-  ingressClassName: "nginx"
+  name: "backend-ingress-alb"
+  ingressClassName: "alb"
   annotations:
-    nginx.ingress.kubernetes.io/preserve-host: "true"
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
 # ==================================================
 # Backend Resource Management (Deployment)
 # ==================================================

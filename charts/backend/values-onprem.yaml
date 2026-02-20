@@ -68,18 +68,18 @@ nfs:
   server: 10.5.4.110
   path: /mnt/video_data
   mountPath: /video_data
+
 # ==================================================
-# Backend ingress 
-# alb 전용
+# Backend ingress , secret
+# nginx 전용
 # ==================================================
 secrets:
-  name: "backend-secret-alb"
+  name: "backend-secret-onprem"
 ingress:
-  name: "backend-ingress-alb"
-  ingressClassName: "alb"
+  name: "backend-ingress-nginx"
+  ingressClassName: "nginx"
   annotations:
-    alb.ingress.kubernetes.io/scheme: "internet-facing"
-    alb.ingress.kubernetes.io/target-type: "ip"
+    nginx.ingress.kubernetes.io/preserve-host: "true"
 # ==================================================
 # Backend Resource Management (Deployment)
 # ==================================================
@@ -96,7 +96,7 @@ resources:
 probes:
   enabled: true
   readiness:
-    path: /metrics
+    path: /health
     initialDelaySeconds: 10
     periodSeconds: 10
     failureThreshold: 3

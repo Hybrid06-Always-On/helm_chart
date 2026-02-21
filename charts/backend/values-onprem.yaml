@@ -46,7 +46,7 @@ job:
   ttlSecondsAfterFinished: 300 #  완료 후 5분 뒤 삭제
   image:
     repository: arjleun581/backend-encode
-    tag: "1.0"
+    tag: "6.0"
     pullPolicy: IfNotPresent
 cronjob:
   enabled: true
@@ -59,7 +59,7 @@ cronjob:
   restartPolicy: OnFailure
   image:
     repository: arjleun581/backend-encode
-    tag: "1.0"
+    tag: "6.0"
     pullPolicy: IfNotPresent
 # ==================================================
 # Common NFS (Job / CronJob 공통 사용)

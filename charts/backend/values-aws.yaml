@@ -3,7 +3,7 @@
 # ==================================================
 
 # backend Deployment 파드 개수
-replicaCount: 3
+replicaCount: 1
 # backend Deployment / Pod 라벨
 labels:
   app: backend
@@ -96,7 +96,7 @@ resources:
 probes:
   enabled: true
   readiness:
-    path: /metrics
+    path: /health
     initialDelaySeconds: 10
     periodSeconds: 10
     failureThreshold: 3

@@ -13,7 +13,7 @@ components:
 # backend API 컨테이너 이미지
 image:
   repository: arjleun581/backend-api
-  tag: "11.0"
+  tag: "16.0"
   pullPolicy: IfNotPresent
 # backend API 컨테이너 포트
 containerPort: 3000
@@ -54,7 +54,7 @@ cronjob:
   schedule: "0 0 */5 * *"
   startingDeadlineSeconds: 300
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1 
+  successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   restartPolicy: OnFailure
   image:
@@ -68,7 +68,6 @@ onprem:
   enabled: false
 aws:
   enabled: true
-
 persistence:
   size: 3Gi
   mountPath: /video_data
@@ -122,4 +121,3 @@ frontend:
 backend:
   serviceName: backend-svc
   servicePort: 3000
-

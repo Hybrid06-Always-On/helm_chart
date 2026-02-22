@@ -62,11 +62,16 @@ cronjob:
     tag: "6.0"
     pullPolicy: IfNotPresent
 # ==================================================
-# Common NFS (Job / CronJob 공통 사용)
+# Common onprem storage (Job / CronJob 공통 사용)
 # ==================================================
-nfs:
-  server: 10.5.4.110
-  path: /mnt/video_data
+onprem:
+  enabled: true
+
+aws:
+  enabled: false
+
+persistence:
+  size: 3Gi
   mountPath: /video_data
 # ==================================================
 # Backend ingress , secret

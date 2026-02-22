@@ -62,12 +62,17 @@ cronjob:
     tag: "5.0"
     pullPolicy: IfNotPresent
 # ==================================================
-# Common NFS (Job / CronJob 공통 사용)
+# Common aws storage (Job / CronJob 공통 사용) 
 # ==================================================
-nfs:
-  server: 10.5.4.110
-  path: /mnt/video_data
+onprem:
+  enabled: false
+aws:
+  enabled: true
+
+persistence:
+  size: 3Gi
   mountPath: /video_data
+  storageClass: efs-sc
 # ==================================================
 # Backend ingress 
 # alb 전용
@@ -117,3 +122,4 @@ frontend:
 backend:
   serviceName: backend-svc
   servicePort: 3000
+

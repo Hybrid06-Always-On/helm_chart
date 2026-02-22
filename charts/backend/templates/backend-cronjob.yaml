@@ -34,11 +34,10 @@ spec:
 
               volumeMounts:
                 - name: video-data
-                  mountPath: {{ .Values.nfs.mountPath }}
+                  mountPath: {{ .Values.persistence.mountPath }}
 
           volumes:
             - name: video-data
-              nfs:
-                server: {{ .Values.nfs.server }}
-                path: {{ .Values.nfs.path }}
+              persistentVolumeClaim:
+                claimName: {{ include "backend.fullname" . }}-pvc
 {{- end }}

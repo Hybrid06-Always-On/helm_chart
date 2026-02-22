@@ -1,0 +1,44 @@
+{{- $name := include "backend.fullname" . -}}
+
+{{- if .Values.onprem.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $name }}-nfs-pv
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""   # ✅ onprem 정적 PV/PVC 필수
+  nfs:
+    server: 10.5.4.110
+    path: /mnt/video_data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""   # ✅ default SC 방지
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size }}
+  volumeName: {{ $name }}-nfs-pv
+
+{{- else if .Values.aws.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.persistence.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size }}
+{{- end }}

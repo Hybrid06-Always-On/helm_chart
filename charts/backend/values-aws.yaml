@@ -68,6 +68,9 @@ onprem:
   enabled: false
 aws:
   enabled: true
+  fileSystemId: fs-00a908f03bd5922f3  # 실제 EFS ID
+  accessPointId: fsap-08e3800ba21760182 # 실제 Access Point ID
+
 persistence:
   size: 3Gi
   mountPath: /video_data

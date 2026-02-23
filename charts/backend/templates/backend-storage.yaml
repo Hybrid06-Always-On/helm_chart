@@ -31,6 +31,24 @@ spec:
 
 {{- else if .Values.aws.enabled }}
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $name }}-aws-pv  # AWS 전용 PV 이름
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.persistence.storageClass }}
+  csi:
+    driver: efs.csi.aws.com
+    # 여기에 새 EFS ID와 Access Point ID를 넣어야 합니다.
+    # values-aws.yaml에 아래 변수들을 추가할 예정입니다.
+    volumeHandle: {{ .Values.aws.fileSystemId }}::{{ .Values.aws.accessPointId }}
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ $name }}-pvc
@@ -41,4 +59,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.persistence.size }}
+  volumeName: {{ $name }}-aws-pv # 위에서 만든 PV와 명시적으로 연결
 {{- end }}

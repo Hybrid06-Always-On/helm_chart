@@ -68,7 +68,10 @@ onprem:
   enabled: false
 aws:
   enabled: true
-  
+  # [추가] 정적 PV 연결을 위한 실제 EFS 및 AP 정보를 입력합니다.
+  fileSystemId: "fs-00a908f03bd5922f3"   # 이미지 a9a4a2에서 확인된 ID
+  accessPointId: "fsap-08e3800ba21760182" # 이미지 a9a483에서 확인된 ID
+
 persistence:
   size: 3Gi
   mountPath: /video_data

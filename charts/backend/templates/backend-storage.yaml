@@ -1,9 +1,7 @@
 {{- $name := include "backend.fullname" . -}}
 
-#
-# --- On-prem 설정 섹션 --- 
-# 
 {{- if .Values.onprem.enabled }}
+# --- On-prem 설정 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -14,7 +12,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
+  storageClassName: "" 
   nfs:
     server: 10.5.4.110
     path: /mnt/video_data
@@ -26,18 +24,32 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
+  storageClassName: "" 
   resources:
     requests:
       storage: {{ .Values.persistence.size }}
   volumeName: {{ $name }}-nfs-pv
-{{- end }}
 
-#
-# --- AWS 설정 섹션 ---
-#
-
-{{- if .Values.aws.enabled }}
+{{- else if .Values.aws.enabled }}
+# --- AWS 설정 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $name }}-aws-pv
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  # values.yaml의 efs-sc와 매칭
+  storageClassName: {{ .Values.persistence.storageClass | default "efs-sc" }}
+  csi:
+    driver: efs.csi.aws.com
+    # 이미지에서 확인된 ID들로 연결
+    volumeHandle: {{ .Values.aws.fileSystemId }}::{{ .Values.aws.accessPointId }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -45,8 +57,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: {{ .Values.persistence.storageClass | quote }} # efs-sc 사용
+  storageClassName: {{ .Values.persistence.storageClass | default "efs-sc" }}
   resources:
     requests:
       storage: {{ .Values.persistence.size }}
-{{- end }}
+  volumeName: {{ $name }}-aws-pv
+{{- end }} {{/* 이 end 하나가 전체를 닫아야 합니다 */}}

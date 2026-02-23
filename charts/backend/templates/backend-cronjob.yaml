@@ -35,6 +35,7 @@ spec:
               volumeMounts:
                 - name: video-data
                   mountPath: {{ .Values.persistence.mountPath }}
+                  subPath: "video_data"
 
           volumes:
             - name: video-data

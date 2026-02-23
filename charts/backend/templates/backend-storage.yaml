@@ -1,5 +1,8 @@
 {{- $name := include "backend.fullname" . -}}
 
+#
+# --- On-prem 설정 섹션 --- 
+# 
 {{- if .Values.onprem.enabled }}
 apiVersion: v1
 kind: PersistentVolume
@@ -11,7 +14,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""   # ✅ onprem 정적 PV/PVC 필수
+  storageClassName: ""
   nfs:
     server: 10.5.4.110
     path: /mnt/video_data
@@ -23,31 +26,18 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""   # ✅ default SC 방지
+  storageClassName: ""
   resources:
     requests:
       storage: {{ .Values.persistence.size }}
   volumeName: {{ $name }}-nfs-pv
+{{- end }}
 
-{{- else if .Values.aws.enabled }}
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ $name }}-aws-pv  # AWS 전용 PV 이름
-spec:
-  capacity:
-    storage: {{ .Values.persistence.size }}
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.persistence.storageClass }}
-  csi:
-    driver: efs.csi.aws.com
-    # 여기에 새 EFS ID와 Access Point ID를 넣어야 합니다.
-    # values-aws.yaml에 아래 변수들을 추가할 예정입니다.
-    volumeHandle: {{ .Values.aws.fileSystemId }}::{{ .Values.aws.accessPointId }}
----
+#
+# --- AWS 설정 섹션 ---
+#
+
+{{- if .Values.aws.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -55,9 +45,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: {{ .Values.persistence.storageClass }}
+  storageClassName: {{ .Values.persistence.storageClass | quote }} # efs-sc 사용
   resources:
     requests:
       storage: {{ .Values.persistence.size }}
-  volumeName: {{ $name }}-aws-pv # 위에서 만든 PV와 명시적으로 연결
 {{- end }}

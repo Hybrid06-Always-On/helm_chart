@@ -1,0 +1,26 @@
+replicaCount: 3
+image:
+  repository: rlflsehdgur431/my-frontend1
+  tag: "14.0"
+  pullPolicy: IfNotPresent
+containerPort: 80
+service:
+  name: frontend-svc
+  type: ClusterIP
+  port: 80
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+hpa:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+probes:
+  enabled: true
+  readinessPath: /
+  livenessPath: /
